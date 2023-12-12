@@ -111,17 +111,17 @@ void processCommand(String s) {
     String deltay = s.substring(secondSpace);
     float delta_x = deltax.toFloat();
     float delta_y = deltay.toFloat();
-    if ((x + delta_x)>=0 and (x+delta_x)<=100){
+    if ((x + delta_x)>=-100 and (x+delta_x)<=100){
     x = x + delta_x;
-    if (delta_x>0 and x >=0) {
+    if (delta_x>0) {
       move(stepXPin, millisBtwnSteps, dirXPin, HIGH, 1);}
-    else if (delta_x<0 and x>=0){
+    else if (delta_x<0){
       move(stepXPin, millisBtwnSteps, dirXPin, LOW, 1);}
-    } if ((y + delta_y)>=0 and (y + delta_y)<=100){
+    } if ((y + delta_y)>=-100 and (y + delta_y)<=100){
       y = y + delta_y;
-    if (delta_y>0 and y >=0){
+    if (delta_y>0){
       move(stepYPin, millisBtwnSteps, dirYPin, HIGH, 1);}
-    else if (delta_y<0 and y>=0){
+    else if (delta_y<0){
       move(stepYPin, millisBtwnSteps, dirYPin, LOW, 1);}
     }
   } else if (s.startsWith("!moa x")) {
