@@ -56,8 +56,8 @@ int steps = 0;
 void setup() {
   Serial.begin(9600);
 
-  pinMode(enPin, OUTPUT);
-  digitalWrite(enPin, HIGH);
+  //pinMode(enPin, OUTPUT);
+  //digitalWrite(enPin, HIGH);
   pinMode(stepPin, OUTPUT);
   pinMode(dirPin, OUTPUT);
   
@@ -65,6 +65,7 @@ void setup() {
   pinMode (dataPin, OUTPUT);
   pinMode (clockPin, OUTPUT);
   pinMode (latchPin, OUTPUT);
+
   pinMode(GFP, OUTPUT);
   pinMode(RFP, OUTPUT);
   pinMode(BF, OUTPUT);
@@ -86,13 +87,15 @@ void setup() {
  }
  
 void rotateStepper(int channel) {
-  int stepsToMove = map(channel, 1, 3, 1, stepsPerRevolution);
-  myStepper.step(stepsToMove);
-  steps = stepsToMove;
+  int channelsteps = channel*100;//change this
+  for (int i = 0; i <channelsteps; i++){
+  myStepper.step(-1);}
+  steps = channel*100;
 }
 
 void resetStepper(int currentsteps) {
-  for (int i = 0; i <currentsteps; i++){
+  int reset = stepsPerRevolution - currentsteps;
+  for (int i = 0; i <reset; i++){
   myStepper.step(-1);
   }
 }
@@ -112,6 +115,7 @@ void loop() {
             PORTB = currentPattern_;
             if (currentPattern_ == 1) { //BF
             resetStepper(steps);
+            delay(500);
             digitalWrite(GFP, LOW);
             digitalWrite(RFP, LOW);
             digitalWrite(BF, LOW);
@@ -120,6 +124,7 @@ void loop() {
             }
             else if (currentPattern_ == 2) { //GFP
             resetStepper(steps);
+            delay(500);
             digitalWrite(GFP, LOW);
             digitalWrite(RFP, LOW);
             digitalWrite(BF, LOW);
@@ -128,6 +133,7 @@ void loop() {
             }
             else if (currentPattern_ == 3) { //RFP
             resetStepper(steps);
+            delay(500);
             digitalWrite(GFP, LOW);
             digitalWrite(RFP, LOW);
             digitalWrite(BF, LOW);
