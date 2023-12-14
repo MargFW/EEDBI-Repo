@@ -20,16 +20,20 @@ const int enPin=8;
 const int stepPin = 2;
 const int dirPin = 5;
 
+bool cal = false;
+
 const int stepsPerRev = 1600; 
 int pulseWidthMicros = 1600;
 int millisBtwnSteps = 400;
 String cmd = "" ;
+
 float z = 0.0;
 
 void setup() {
   Serial.begin(9600);
   pinMode(enPin, OUTPUT);
-  digitalWrite(enPin, HIGH);
+  pinMode(7, INPUT_PULLUP);
+  digitalWrite(enPin, LOW);
   pinMode(stepPin, OUTPUT);
   pinMode(dirPin, OUTPUT);
   reply ("Vers:LS_z");
@@ -82,14 +86,18 @@ void processCommand(String s) {
   } else if (s.startsWith("!speed z")) {
     delay(5);
   } else if (s.startsWith("!mor z")) {
-    String delta = s.substring(s.indexOf("z") + 1);
-    float movezft = delta.toFloat()/3.1;
-    int movez = round(abs(movezft));
-    z = z + delta.toFloat();
-    if (delta.toFloat()>0){
-      move(millisBtwnSteps, LOW, 1);}
-    else if (delta.toFloat()<0){
-      move(millisBtwnSteps, HIGH, 1);}
+    if (cal){
+      String delta = s.substring(s.indexOf("z") + 1);
+      z = z + delta.toFloat();
+      if (delta.toFloat()>0){
+        move(millisBtwnSteps, LOW, 1);}
+      else if (delta.toFloat()<0){
+        move(millisBtwnSteps, HIGH, 1);}
+    }
+    else{
+      home(0);
+      cal= true;
+    }
   } else if (s.startsWith("!moa z")) {
     String apos = s.substring(s.indexOf("z") + 1);
     z = apos.toFloat();
@@ -114,6 +122,25 @@ void move(int speed, bool dir, int dist) {
     delayMicroseconds(pulseWidthMicros);
     digitalWrite(stepPin, LOW);
     delayMicroseconds(speed);
+  }
+  digitalWrite(enPin, HIGH); 
+}
+
+void home(int pos){
+  digitalWrite(dirPin, HIGH);
+  digitalWrite(enPin, LOW);
+  while (digitalRead(7) == HIGH){
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(pulseWidthMicros);
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(millisBtwnSteps);
+  }
+  digitalWrite(dirPin, LOW);
+  for (int i = 0; i < 50; i++) {
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(pulseWidthMicros);
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(millisBtwnSteps);
   }
   digitalWrite(enPin, HIGH); 
 }
