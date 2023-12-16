@@ -143,7 +143,7 @@ void home(int pos){
     }
     else if (limit.isPressed()){
       digitalWrite(dirPin, LOW);
-      for (int i = 0; i < 50; i++) {
+      for (int i = 0; i < 1000; i++) {
         digitalWrite(stepPin, HIGH);
         delayMicroseconds(pulseWidthMicros);
         digitalWrite(stepPin, LOW);
