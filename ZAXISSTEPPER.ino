@@ -15,6 +15,7 @@
 // Handshaking,Off
 // Parity,None
 // StopBits,1
+#include <ezButton.h>
 
 const int enPin=8;
 const int stepPin = 2;
@@ -27,12 +28,15 @@ int pulseWidthMicros = 1600;
 int millisBtwnSteps = 400;
 String cmd = "" ;
 
+ezButton limit(7);
+
 float z = 0.0;
 
 void setup() {
   Serial.begin(9600);
   pinMode(enPin, OUTPUT);
-  pinMode(7, INPUT_PULLUP);
+  //pinMode(7, INPUT_PULLUP);
+  limit.setDebounceTime(100);
   digitalWrite(enPin, LOW);
   pinMode(stepPin, OUTPUT);
   pinMode(dirPin, OUTPUT);
@@ -127,20 +131,25 @@ void move(int speed, bool dir, int dist) {
 }
 
 void home(int pos){
+  limit.loop();
   digitalWrite(dirPin, HIGH);
   digitalWrite(enPin, LOW);
-  while (digitalRead(7) == HIGH){
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(pulseWidthMicros);
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(millisBtwnSteps);
-  }
-  digitalWrite(dirPin, LOW);
-  for (int i = 0; i < 50; i++) {
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(pulseWidthMicros);
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(millisBtwnSteps);
-  }
+  while (true){
+    if (limit.isPressed() == false){
+      digitalWrite(stepPin, HIGH);
+      delayMicroseconds(pulseWidthMicros);
+      digitalWrite(stepPin, LOW);
+      delayMicroseconds(millisBtwnSteps);
+    }
+    else if (limit.isPressed()){
+      digitalWrite(dirPin, LOW);
+      for (int i = 0; i < 50; i++) {
+        digitalWrite(stepPin, HIGH);
+        delayMicroseconds(pulseWidthMicros);
+        digitalWrite(stepPin, LOW);
+        delayMicroseconds(millisBtwnSteps);
+      }
+    break;
+    }
   digitalWrite(enPin, HIGH); 
 }
